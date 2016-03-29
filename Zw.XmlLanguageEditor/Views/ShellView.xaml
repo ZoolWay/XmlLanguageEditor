@@ -1,13 +1,43 @@
 <Window x:Class="Zw.XmlLanguageEditor.Views.ShellView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cal="http://www.caliburnproject.org"
         >
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-    <Grid Background="White">
-        <TextBlock Text="Hello Caliburn Micro!"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   FontSize="20" />
+        <Menu Grid.Row="0">
+            <MenuItem Header="File">
+                <MenuItem Header="Open master file" cal:Message.Attach="OpenMaster" />
+                <MenuItem Header="Add secondary file" cal:Message.Attach="OpenSecondary" IsEnabled="{Binding IsMasterFileLoaded}" />
+                <MenuItem Header="Close secondary files" cal:Message.Attach="CloseSecondaries" IsEnabled="{Binding IsSecondaryFileLoaded}" />
+                <MenuItem Header="Close all" cal:Message.Attach="CloseAll" IsEnabled="{Binding IsAnyLoaded}" />
+                <Separator />
+                <MenuItem Header="Save all" cal:Message.Attach="SaveAll" IsEnabled="{Binding IsAnyLoaded}" />
+                <Separator />
+                <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
+            </MenuItem>
+            <MenuItem Header="Options">
+                <MenuItem Header="Auto-add missing entries to master file" IsCheckable="True" IsChecked="{Binding OptionAutoAddToMaster}" />
+                <MenuItem Header="Auto-add missing entries to secondary files" IsCheckable="True" IsChecked="{Binding OptionAutoAddToSecondaries}" />
+            </MenuItem>
+        </Menu>
+
+        <ContentControl Grid.Row="1" x:Name="XmlGridView" />
+
+        <Border Grid.Row="0" Grid.RowSpan="2" Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Border.Background>
+                <SolidColorBrush Color="SteelBlue" Opacity="0.8" />
+            </Border.Background>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32" Text="loading..." />
+        </Border>
+
     </Grid>
 
 </Window>
