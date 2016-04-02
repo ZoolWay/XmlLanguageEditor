@@ -26,6 +26,7 @@ namespace Zw.XmlLanguageEditor.ViewModels.Behaviors
         public bool IsDetailPanelColumn { get; set; }
 
         public bool IsVisible { get; set; }
+        public bool IsEditable { get; internal set; }
 
         public void ShowInDetailPanel()
         {

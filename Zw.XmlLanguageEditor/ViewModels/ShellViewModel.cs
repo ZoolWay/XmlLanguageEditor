@@ -1,4 +1,5 @@
 using Caliburn.Micro;
+using Microsoft.Win32;
 using System.Threading.Tasks;
 
 namespace Zw.XmlLanguageEditor.ViewModels
@@ -22,6 +23,26 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public void CloseApplication()
         {
             TryClose();
+        }
+
+        public void OpenMaster()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Open master file";
+            if (ofd.ShowDialog().GetValueOrDefault(false))
+            {
+                this.XmlGridView.OpenMasterFile(ofd.FileName);
+            }
+        }
+    
+        public void OpenSecondary()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Title = "Add secondary file";
+            if (ofd.ShowDialog().GetValueOrDefault(false))
+            {
+                this.XmlGridView.AddSecondaryFile(ofd.FileName);
+            }
         }
 
         protected async override void OnInitialize()

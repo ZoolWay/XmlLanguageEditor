@@ -80,6 +80,8 @@
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="IShell.cs" />
+    <Compile Include="Parsing\Entry.cs" />
+    <Compile Include="Parsing\Parser.cs" />
     <Compile Include="ViewModels\Behaviors\Column.cs" />
     <Compile Include="ViewModels\Behaviors\ColumnConfig.cs" />
     <Compile Include="ViewModels\Behaviors\GridViewSort.cs" />
@@ -91,12 +93,21 @@
     <Compile Include="ViewModels\ValueConverters\ColumnIsVisibleToWidthConverter.cs" />
     <Compile Include="ViewModels\ValueConverters\ConfigToDynamicGridViewConverter.cs" />
     <Compile Include="ViewModels\XmlGridViewModel.cs" />
+    <Compile Include="ViewModels\XmlRecordViewModel.cs" />
     <Compile Include="Views\XmlGridView.xaml.cs">
       <DependentUpon>XmlGridView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\ShellView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Templates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\XmlGridView.xaml">
       <SubType>Designer</SubType>

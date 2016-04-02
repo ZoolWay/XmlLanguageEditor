@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Zw.XmlLanguageEditor.ViewModels.Behaviors
 {
@@ -14,6 +11,13 @@ namespace Zw.XmlLanguageEditor.ViewModels.Behaviors
     /// </remarks>
     public class ColumnConfig
     {
-        public IEnumerable<Column> Columns { get; set; }
+
+        public List<Column> Columns { get; private set; }
+
+        public ColumnConfig()
+        {
+            this.Columns = new List<Column>();
+        }
+
     }
 }

@@ -10,9 +10,14 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <vc:ConfigToDynamicGridViewConverter x:Key="ConfigToDynamicGridViewConverter" />
+        <Style x:Key="ItemContainerStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
     </UserControl.Resources>
-    <ListView ItemsSource="{Binding Entries}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}"
-              b:GridViewSort.AutoSort="True"
+    <ListView ItemsSource="{Binding Records}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}"
+              b:GridViewSort.AutoSort="True" b:GridViewSort.ShowSortGlyph="True"
+              ItemContainerStyle="{StaticResource ItemContainerStyle}"
+              Margin="4"
               >
     </ListView>
 </UserControl>

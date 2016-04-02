@@ -35,12 +35,28 @@ namespace Zw.XmlLanguageEditor.ViewModels.ValueConverters
                     foreach (var column in config.Columns)
                     {
                         var bindingDisplayMember = new Binding(column.DataField);
-                        GridViewColumn gvc = new GridViewColumn { Header = column, DisplayMemberBinding = bindingDisplayMember };
+                        GridViewColumn gvc = new GridViewColumn { Header = column };
                         var bindingWidth = new Binding("IsVisible");
                         bindingWidth.Source = column;
                         bindingWidth.Converter = this.columnIsVisibleToWidthConverter;
                         BindingOperations.SetBinding(gvc, GridViewColumn.WidthProperty, bindingWidth);
                         gvc.SetValue(GridViewSort.PropertyNameProperty, bindingDisplayMember.Path.Path);
+                        if (column.IsEditable)
+                        {
+                            //gvc.CellTemplate = Application.Current.FindResource("CellEditableTemplate") as DataTemplate;
+                            FrameworkElementFactory columnFactory = new FrameworkElementFactory(typeof(TextBox));
+                            columnFactory.SetBinding(TextBox.TextProperty, bindingDisplayMember);
+                            columnFactory.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("EditableCellTextBox") as Style);
+
+                            DataTemplate columnTemplate = new DataTemplate();
+                            columnTemplate.VisualTree = columnFactory;
+                            gvc.CellTemplate = columnTemplate;
+                        }
+                        else
+                        {
+                            gvc.DisplayMemberBinding = bindingDisplayMember;
+                        }
+
                         gridView.Columns.Add(gvc);
                     }
                 }

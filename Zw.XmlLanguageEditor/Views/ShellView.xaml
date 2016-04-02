@@ -15,11 +15,11 @@
         <Menu Grid.Row="0">
             <MenuItem Header="File">
                 <MenuItem Header="Open master file" cal:Message.Attach="OpenMaster" />
-                <MenuItem Header="Add secondary file" cal:Message.Attach="OpenSecondary" IsEnabled="{Binding IsMasterFileLoaded}" />
-                <MenuItem Header="Close secondary files" cal:Message.Attach="CloseSecondaries" IsEnabled="{Binding IsSecondaryFileLoaded}" />
-                <MenuItem Header="Close all" cal:Message.Attach="CloseAll" IsEnabled="{Binding IsAnyLoaded}" />
+                <MenuItem Header="Add secondary file" cal:Message.Attach="OpenSecondary" IsEnabled="{Binding XmlGridView.IsMasterFileLoaded}" />
+                <MenuItem Header="Close secondary files" cal:Message.Attach="CloseSecondaries" IsEnabled="{Binding XmlGridView.IsSecondaryFileLoaded}" />
+                <MenuItem Header="Close all" cal:Message.Attach="CloseAll" IsEnabled="{Binding XmlGridView.IsAnyLoaded}" />
                 <Separator />
-                <MenuItem Header="Save all" cal:Message.Attach="SaveAll" IsEnabled="{Binding IsAnyLoaded}" />
+                <MenuItem Header="Save all" cal:Message.Attach="SaveAll" IsEnabled="{Binding XmlGridView.IsAnyLoaded}" />
                 <Separator />
                 <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
             </MenuItem>
