@@ -45,6 +45,12 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
+        public void SaveAll()
+        {
+            if (!this.XmlGridView.IsAnyLoaded) return;
+            this.XmlGridView.WriteAllFilesToDisk();
+        }
+
         protected async override void OnInitialize()
         {
             await Task.Delay(250);

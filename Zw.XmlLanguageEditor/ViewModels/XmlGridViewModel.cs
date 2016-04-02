@@ -87,6 +87,26 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
+        internal async void WriteAllFilesToDisk()
+        {
+            try
+            {
+                var masterEntries = this.Records.Select(r => new Entry() { Id = r.Id, Value = r.MasterValue });
+                await Task.Run(() => this.parser.InjectEntries(masterFileName, masterEntries));
+                for (int i = 0; i < secondaryFileNames.Count; i++)
+                {
+                    var entries = this.Records.Select(r => new Entry() { Id = r.Id, Value = r[i] });
+                    await Task.Run(() => this.parser.InjectEntries(secondaryFileNames[i], entries));
+                }
+            }
+            catch (Exception ex)
+            {
+                string m = String.Format("Failed to write master '{0}' and {1} secondary files to storage", masterFileName, secondaryFileNames.Count);
+                log.Error(m, ex);
+                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void MergeSecondaryRecords(IEnumerable<Entry> parsedRecords, int secondaryColumnIndex)
         {
             foreach (var record in parsedRecords)
