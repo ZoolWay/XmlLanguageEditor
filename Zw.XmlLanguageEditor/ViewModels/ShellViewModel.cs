@@ -67,6 +67,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.XmlGridView.WriteAllFilesToDisk();
         }
 
+        public void CloseAll()
+        {
+            if (!this.XmlGridView.IsAnyLoaded) return;
+            log.Debug("Closing all open files");
+            this.XmlGridView.CloseAllFiles();
+        }
+
         protected async override void OnInitialize()
         {
             log.Debug("Initializing");

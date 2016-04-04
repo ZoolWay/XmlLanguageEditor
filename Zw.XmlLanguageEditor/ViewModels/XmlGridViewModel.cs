@@ -45,6 +45,25 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.lastSecondaryIndex = -1;
         }
 
+        public void CloseAllFiles()
+        {
+            log.InfoFormat("Closing master and {0} secondary file(s)", secondaryFileNames.Count);
+            try
+            {
+                Clear();
+                NotifyOfPropertyChange(() => ColumnConfig);
+                this.IsMasterFileLoaded = false;
+                this.IsSecondaryFileLoaded = false;
+                this.IsAnyLoaded = false;
+            }
+            catch (Exception ex)
+            {
+                string m = "Failed to close files";
+                log.Error(m, ex);
+                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         public async void OpenMasterFile(string masterFileName)
         {
             log.InfoFormat("Opening master file: {0}", masterFileName);
