@@ -45,6 +45,8 @@ namespace Zw.XmlLanguageEditor.ViewModels.ValueConverters
                         {
                             //gvc.CellTemplate = Application.Current.FindResource("CellEditableTemplate") as DataTemplate;
                             FrameworkElementFactory columnFactory = new FrameworkElementFactory(typeof(TextBox));
+                            bindingDisplayMember.Mode = BindingMode.TwoWay;
+                            bindingDisplayMember.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                             columnFactory.SetBinding(TextBox.TextProperty, bindingDisplayMember);
                             columnFactory.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("EditableCellTextBox") as Style);
 
