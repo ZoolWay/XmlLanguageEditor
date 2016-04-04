@@ -22,11 +22,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public void CloseApplication()
         {
+            log.Info("Closing application");
             TryClose();
         }
 
         public void OpenMaster()
         {
+            log.Debug("Asking for new master file to open");
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Open master file";
             if (ofd.ShowDialog().GetValueOrDefault(false))
@@ -37,6 +39,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
     
         public void OpenSecondary()
         {
+            log.Debug("Asking for secondary file to open");
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Add secondary file";
             if (ofd.ShowDialog().GetValueOrDefault(false))
@@ -48,11 +51,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public void SaveAll()
         {
             if (!this.XmlGridView.IsAnyLoaded) return;
+            log.Debug("Saving all open files");
             this.XmlGridView.WriteAllFilesToDisk();
         }
 
         protected async override void OnInitialize()
         {
+            log.Debug("Initializing");
             await Task.Delay(250);
             this.IsLoading = false;
         }

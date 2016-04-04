@@ -47,6 +47,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public async void OpenMasterFile(string masterFileName)
         {
+            log.InfoFormat("Opening master file: {0}", masterFileName);
             try
             {
                 Clear();
@@ -68,6 +69,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public async void AddSecondaryFile(string secondaryFileName)
         {
+            log.InfoFormat("Opening secondary file: {0}", secondaryFileName);
             try
             {
                 int newIndex = Interlocked.Increment(ref lastSecondaryIndex);
