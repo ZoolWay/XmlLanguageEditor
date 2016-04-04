@@ -31,6 +31,7 @@ namespace Zw.XmlLanguageEditor
             container.Singleton<IWindowManager, WindowManager>();
             container.Singleton<IEventAggregator, EventAggregator>();
             container.PerRequest<IShell, ShellViewModel>();
+            container.Instance<Configuration>(new Configuration());
         }
 
         protected override object GetInstance(Type service, string key)

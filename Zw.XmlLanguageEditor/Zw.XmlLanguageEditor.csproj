@@ -79,6 +79,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="IShell.cs" />
     <Compile Include="Parsing\Entry.cs" />
     <Compile Include="Parsing\Parser.cs" />

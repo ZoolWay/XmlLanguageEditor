@@ -1,6 +1,8 @@
 using Caliburn.Micro;
 using Microsoft.Win32;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+using System;
 
 namespace Zw.XmlLanguageEditor.ViewModels
 {
@@ -9,14 +11,24 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly Configuration config;
+
         public ShellViewModel()
         {
             this.DisplayName = "Zw.XmlLanguageEditor";
             this.IsLoading = true;
-            this.XmlGridView = new XmlGridViewModel();
+            this.config = IoC.Get<Configuration>();
         }
 
         public bool IsLoading { get; set; }
+
+        public bool OptionHighlightEmptyCells { get; set; }
+
+        public bool OptionHighlightMasterMatchingCells { get; set; }
+
+        public bool OptionAutoAddToMaster { get; set; }
+
+        public bool OptionAutoAddToSecondaries { get; set; }
 
         public XmlGridViewModel XmlGridView { get; private set; }
 
@@ -58,9 +70,33 @@ namespace Zw.XmlLanguageEditor.ViewModels
         protected async override void OnInitialize()
         {
             log.Debug("Initializing");
+            await Task.Run(() => config.Load());
+            this.OptionHighlightEmptyCells = config.HightlightEmptyCells;
+            this.OptionHighlightMasterMatchingCells = config.HighlightMasterMatchingCells;
+            this.XmlGridView = new XmlGridViewModel();
             await Task.Delay(250);
             this.IsLoading = false;
         }
 
+        protected async override void OnDeactivate(bool close)
+        {
+            if (!close) return;
+            await Task.Run(() => config.Save());
+        }
+
+        public override void NotifyOfPropertyChange([CallerMemberName] string propertyName = null)
+        {
+            base.NotifyOfPropertyChange(propertyName);
+            if (propertyName.StartsWith("Option"))
+            {
+                ReadConfigValuesFromShell();
+            }
+        }
+
+        private void ReadConfigValuesFromShell()
+        {
+            this.config.HightlightEmptyCells = this.OptionHighlightEmptyCells;
+            this.config.HighlightMasterMatchingCells = this.OptionHighlightMasterMatchingCells;
+        }
     }
 }

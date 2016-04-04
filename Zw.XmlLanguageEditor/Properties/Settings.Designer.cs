@@ -46,5 +46,29 @@ namespace Zw.XmlLanguageEditor.Properties {
                 this["AutoAddToSecondaries"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HighlightEmptyCells {
+            get {
+                return ((bool)(this["HighlightEmptyCells"]));
+            }
+            set {
+                this["HighlightEmptyCells"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool HightlightMasterMatchingCells {
+            get {
+                return ((bool)(this["HightlightMasterMatchingCells"]));
+            }
+            set {
+                this["HightlightMasterMatchingCells"] = value;
+            }
+        }
     }
 }

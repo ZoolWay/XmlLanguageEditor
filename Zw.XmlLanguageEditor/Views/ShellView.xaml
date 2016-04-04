@@ -24,6 +24,9 @@
                 <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
             </MenuItem>
             <MenuItem Header="Options">
+                <MenuItem Header="Highlight empty entries" IsCheckable="True" IsChecked="{Binding OptionHighlightEmptyCells}" />
+                <MenuItem Header="Highlight master-machting entries" IsCheckable="True" IsChecked="{Binding OptionHighlightMasterMatchingCells}" />
+                <Separator />
                 <MenuItem Header="Auto-add missing entries to master file" IsCheckable="True" IsChecked="{Binding OptionAutoAddToMaster}" />
                 <MenuItem Header="Auto-add missing entries to secondary files" IsCheckable="True" IsChecked="{Binding OptionAutoAddToSecondaries}" />
             </MenuItem>
