@@ -54,7 +54,19 @@ namespace Zw.XmlLanguageEditor
 
         protected override void OnStartup(object sender, System.Windows.StartupEventArgs e)
         {
+            System.Windows.Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+            System.AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             DisplayRootViewFor<IShell>();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            log.Fatal(String.Format("Unhandles appdomain exception; object: '{0}' ({1})", e.ExceptionObject, e.ExceptionObject?.GetType().FullName), e.ExceptionObject as Exception);
+        }
+
+        private void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            log.Fatal(String.Format("Unhandled dispatcher exception; dispatcher associated thread: '{0}'", e.Dispatcher?.Thread?.ManagedThreadId), e.Exception);
         }
     }
 }
