@@ -60,6 +60,18 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
+        public void CreateSecondary()
+        {
+            log.Debug("Asking for a new secondary file to create");
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Title = "Create new secondary file";
+            sfd.OverwritePrompt = true;
+            if (sfd.ShowDialog().GetValueOrDefault(false))
+            {
+                this.XmlGridView.CreateSecondaryFile(sfd.FileName);
+            }
+        }
+
         public void SaveAll()
         {
             if (!this.XmlGridView.IsAnyLoaded) return;

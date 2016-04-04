@@ -21,6 +21,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         private readonly List<string> secondaryFileNames;
         private readonly Parsing.Parser parser;
         private string masterFileName;
+        private string masterRootElementName;
         private int lastSecondaryIndex;
 
         public ColumnConfig ColumnConfig { get; protected set; }
@@ -71,8 +72,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
             {
                 Clear();
                 this.masterFileName = masterFileName;
-                var parsedRecords = await Task.Run(() => this.parser.ReadRecords(masterFileName));
-                var viewModels = BuildMasterViewModels(parsedRecords);
+                var result = await Task.Run(() => this.parser.ReadRecords(masterFileName));
+                this.masterRootElementName = result.RootElementName;
+                var viewModels = BuildMasterViewModels(result.Records);
                 this.records.AddRange(viewModels);
                 BuildMasterColumns();
                 this.IsMasterFileLoaded = true;
@@ -94,8 +96,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 int newIndex = Interlocked.Increment(ref lastSecondaryIndex);
                 while ((this.secondaryFileNames.Count - 1) < newIndex) this.secondaryFileNames.Add(null);
                 this.secondaryFileNames[newIndex] = secondaryFileName;
-                var parsedRecords = await Task.Run(() => this.parser.ReadRecords(secondaryFileName));
-                MergeSecondaryRecords(parsedRecords, newIndex);
+                var result = await Task.Run(() => this.parser.ReadRecords(secondaryFileName));
+                MergeSecondaryRecords(result.Records, newIndex);
                 BuildSecondardColumn(Path.GetFileNameWithoutExtension(secondaryFileName), newIndex);
                 this.IsSecondaryFileLoaded = true;
                 this.IsAnyLoaded = true;
@@ -106,6 +108,14 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 log.Error(m, ex);
                 MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        public async void CreateSecondaryFile(string secondaryFileName)
+        {
+            log.InfoFormat("Creating new secondary file: {0}", secondaryFileName);
+            bool success = await CreateSecondaryFileOnDisk(secondaryFileName);
+            if (!success) return;
+            AddSecondaryFile(secondaryFileName);
         }
 
         internal async void WriteAllFilesToDisk()
@@ -180,5 +190,22 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.masterFileName = null;
             this.secondaryFileNames.Clear();
         }
+
+        private async Task<bool> CreateSecondaryFileOnDisk(string secondaryFileName)
+        {
+            try
+            {
+                await Task.Run(() => parser.CreateEmpty(this.masterRootElementName, secondaryFileName));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                string m = String.Format("Failed to create secondary files '{0}'", secondaryFileName);
+                log.Error(m, ex);
+                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);                
+            }
+            return false;
+        }
+
     }
 }

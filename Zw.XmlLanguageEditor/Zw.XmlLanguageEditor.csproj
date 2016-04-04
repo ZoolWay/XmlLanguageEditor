@@ -83,6 +83,7 @@
     <Compile Include="IShell.cs" />
     <Compile Include="Parsing\Entry.cs" />
     <Compile Include="Parsing\Parser.cs" />
+    <Compile Include="Parsing\ParseResult.cs" />
     <Compile Include="ViewModels\Behaviors\Column.cs" />
     <Compile Include="ViewModels\Behaviors\ColumnConfig.cs" />
     <Compile Include="ViewModels\Behaviors\GridViewSort.cs" />
