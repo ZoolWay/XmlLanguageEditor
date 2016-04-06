@@ -14,10 +14,10 @@
 
         <Menu Grid.Row="0">
             <MenuItem Header="File">
-                <MenuItem Header="Open master file" cal:Message.Attach="OpenMaster" />
-                <MenuItem Header="Add secondary file" cal:Message.Attach="OpenSecondary" IsEnabled="{Binding XmlGridView.IsMasterFileLoaded}" />
-                <MenuItem Header="Create new secondary file" cal:Message.Attach="CreateSecondary" IsEnabled="{Binding XmlGridView.IsMasterFileLoaded}" />
-                <MenuItem Header="Close secondary files" cal:Message.Attach="CloseSecondaries" IsEnabled="{Binding XmlGridView.IsSecondaryFileLoaded}" />
+                <MenuItem Header="Open Main Language" cal:Message.Attach="OpenMaster" />
+                <MenuItem Header="Add Other Language" cal:Message.Attach="OpenSecondary" IsEnabled="{Binding XmlGridView.IsMasterFileLoaded}" />
+                <MenuItem Header="Create New Language" cal:Message.Attach="CreateSecondary" IsEnabled="{Binding XmlGridView.IsMasterFileLoaded}" />
+                <MenuItem Header="Close All Other Languages" cal:Message.Attach="CloseSecondaries" IsEnabled="{Binding XmlGridView.IsSecondaryFileLoaded}" />
                 <MenuItem Header="Close all" cal:Message.Attach="CloseAll" IsEnabled="{Binding XmlGridView.IsAnyLoaded}" />
                 <Separator />
                 <MenuItem Header="Save all" cal:Message.Attach="SaveAll" IsEnabled="{Binding XmlGridView.IsAnyLoaded}" />
@@ -25,8 +25,8 @@
                 <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
             </MenuItem>
             <MenuItem Header="Options">
-                <MenuItem Header="Highlight empty entries" IsCheckable="True" IsChecked="{Binding OptionHighlightEmptyCells}" />
-                <MenuItem Header="Highlight master-machting entries" IsCheckable="True" IsChecked="{Binding OptionHighlightMasterMatchingCells}" />
+                <MenuItem Header="Mark Missing Translations (no value)" IsCheckable="True" IsChecked="{Binding OptionHighlightEmptyCells}" />
+                <MenuItem Header="Mark Missing Translations (value is the same as main language)" IsCheckable="True" IsChecked="{Binding OptionHighlightMasterMatchingCells}" />
                 <Separator />
                 <MenuItem Header="Auto-add missing entries to master file" IsCheckable="True" IsChecked="{Binding OptionAutoAddToMaster}" />
                 <MenuItem Header="Auto-add missing entries to secondary files" IsCheckable="True" IsChecked="{Binding OptionAutoAddToSecondaries}" />
