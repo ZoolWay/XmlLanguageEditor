@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using PropertyChanged;
 using System;
 using System.Collections.Generic;
 
@@ -9,9 +10,11 @@ namespace Zw.XmlLanguageEditor.ViewModels
         private List<string> secondaryValues;
 
         public string Id { get; set; }
+
+        [AlsoNotifyFor("Self")]
         public string MasterValue { get; set; }
 
-            public string this[int secondaryIndex]
+        public string this[int secondaryIndex]
         {
             get
             {
@@ -21,7 +24,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
             {
                 while (secondaryIndex >= secondaryValues.Count) secondaryValues.Add(null); // fill with emty entries if needed
                 secondaryValues[secondaryIndex] = value;
+                NotifyOfPropertyChange(() => Self);
             }
+        }
+
+        public XmlRecordViewModel Self
+        {
+            get { return this; }
         }
 
         public XmlRecordViewModel()

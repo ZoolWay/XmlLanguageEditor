@@ -92,6 +92,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\ValueConverters\CellBackgroundMarkerConverter.cs" />
     <Compile Include="ViewModels\ValueConverters\ColumnIsVisibleToWidthConverter.cs" />
     <Compile Include="ViewModels\ValueConverters\ConfigToDynamicGridViewConverter.cs" />
     <Compile Include="ViewModels\XmlGridViewModel.cs" />

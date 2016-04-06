@@ -21,6 +21,7 @@ namespace Zw.XmlLanguageEditor.ViewModels.ValueConverters
     {
 
         private readonly ColumnIsVisibleToWidthConverter columnIsVisibleToWidthConverter = new ColumnIsVisibleToWidthConverter();
+        private readonly CellBackgroundMarkerConverter cellBackgroundMarkerConverter = new CellBackgroundMarkerConverter();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -43,12 +44,15 @@ namespace Zw.XmlLanguageEditor.ViewModels.ValueConverters
                         gvc.SetValue(GridViewSort.PropertyNameProperty, bindingDisplayMember.Path.Path);
                         if (column.IsEditable)
                         {
-                            //gvc.CellTemplate = Application.Current.FindResource("CellEditableTemplate") as DataTemplate;
                             FrameworkElementFactory columnFactory = new FrameworkElementFactory(typeof(TextBox));
                             bindingDisplayMember.Mode = BindingMode.TwoWay;
                             bindingDisplayMember.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                             columnFactory.SetBinding(TextBox.TextProperty, bindingDisplayMember);
                             columnFactory.SetValue(FrameworkElement.StyleProperty, Application.Current.FindResource("EditableCellTextBox") as Style);
+                            var bindingBackground = new Binding("Self");
+                            bindingBackground.Converter = cellBackgroundMarkerConverter;
+                            bindingBackground.ConverterParameter = column.DataField;
+                            columnFactory.SetBinding(Control.BackgroundProperty, bindingBackground);
 
                             DataTemplate columnTemplate = new DataTemplate();
                             columnTemplate.VisualTree = columnFactory;
