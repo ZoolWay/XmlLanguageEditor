@@ -189,6 +189,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.records.Clear();
             this.masterFileName = null;
             this.secondaryFileNames.Clear();
+            Interlocked.Exchange(ref this.lastSecondaryIndex, -1);
         }
 
         private async Task<bool> CreateSecondaryFileOnDisk(string secondaryFileName)
