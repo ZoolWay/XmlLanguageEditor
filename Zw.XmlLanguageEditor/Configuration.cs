@@ -8,6 +8,7 @@ namespace Zw.XmlLanguageEditor
 {
     public class Configuration
     {
+
         public bool HightlightEmptyCells { get; set; }
         public bool HighlightMasterMatchingCells { get; set; }
 

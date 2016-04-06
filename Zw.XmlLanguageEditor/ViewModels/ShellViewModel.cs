@@ -13,11 +13,14 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private readonly Configuration config;
 
+        private bool isConfigApplied;
+
         public ShellViewModel()
         {
             this.DisplayName = "Zw.XmlLanguageEditor";
             this.IsLoading = true;
             this.config = IoC.Get<Configuration>();
+            this.isConfigApplied = false;
         }
 
         public bool IsLoading { get; set; }
@@ -92,6 +95,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Load());
             this.OptionHighlightEmptyCells = config.HightlightEmptyCells;
             this.OptionHighlightMasterMatchingCells = config.HighlightMasterMatchingCells;
+            this.isConfigApplied = true;
             this.XmlGridView = new XmlGridViewModel();
             await Task.Delay(250);
             this.IsLoading = false;
@@ -103,17 +107,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Save());
         }
 
-        public override void NotifyOfPropertyChange([CallerMemberName] string propertyName = null)
+        public void UpdateConfigValuesFromShell()
         {
-            base.NotifyOfPropertyChange(propertyName);
-            if (propertyName.StartsWith("Option"))
-            {
-                ReadConfigValuesFromShell();
-            }
-        }
-
-        private void ReadConfigValuesFromShell()
-        {
+            if (!this.isConfigApplied) return;
             this.config.HightlightEmptyCells = this.OptionHighlightEmptyCells;
             this.config.HighlightMasterMatchingCells = this.OptionHighlightMasterMatchingCells;
         }

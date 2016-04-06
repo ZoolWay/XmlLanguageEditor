@@ -25,8 +25,8 @@
                 <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
             </MenuItem>
             <MenuItem Header="Options">
-                <MenuItem Header="Mark Missing Translations (no value)" IsCheckable="True" IsChecked="{Binding OptionHighlightEmptyCells}" />
-                <MenuItem Header="Mark Missing Translations (value is the same as main language)" IsCheckable="True" IsChecked="{Binding OptionHighlightMasterMatchingCells}" />
+                <MenuItem Header="Mark Missing Translations (no value)" IsCheckable="True" IsChecked="{Binding OptionHighlightEmptyCells}" cal:Message.Attach="[Checked] = [UpdateConfigValuesFromShell]; [Unchecked] = [UpdateConfigValuesFromShell]" />
+                <MenuItem Header="Mark Missing Translations (value is the same as main language)" IsCheckable="True" IsChecked="{Binding OptionHighlightMasterMatchingCells}" cal:Message.Attach="[Checked] = [UpdateConfigValuesFromShell]; [Unchecked] = [UpdateConfigValuesFromShell]" />
                 <Separator />
                 <MenuItem Header="Auto-add missing entries to master file" IsCheckable="True" IsChecked="{Binding OptionAutoAddToMaster}" />
                 <MenuItem Header="Auto-add missing entries to secondary files" IsCheckable="True" IsChecked="{Binding OptionAutoAddToSecondaries}" />
