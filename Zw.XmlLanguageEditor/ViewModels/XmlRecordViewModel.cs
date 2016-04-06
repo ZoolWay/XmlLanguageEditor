@@ -35,6 +35,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public XmlRecordViewModel()
         {
+            this.IsNotifying = false;
             this.secondaryValues = new List<string>();
         }
 

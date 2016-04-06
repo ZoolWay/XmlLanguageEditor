@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System;
+using System.Windows;
 
 namespace Zw.XmlLanguageEditor.ViewModels
 {
@@ -44,6 +45,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public void OpenMaster()
         {
             log.Debug("Asking for new master file to open");
+            if (UserWantsToKeepExistingChanges()) return;
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Title = "Open master file";
             if (ofd.ShowDialog().GetValueOrDefault(false))
@@ -85,6 +87,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public void CloseAll()
         {
             if (!this.XmlGridView.IsAnyLoaded) return;
+            if (UserWantsToKeepExistingChanges()) return;
             log.Debug("Closing all open files");
             this.XmlGridView.CloseAllFiles();
         }
@@ -113,5 +116,27 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.config.HightlightEmptyCells = this.OptionHighlightEmptyCells;
             this.config.HighlightMasterMatchingCells = this.OptionHighlightMasterMatchingCells;
         }
+
+        public override void CanClose(Action<bool> callback)
+        {
+            if (this.XmlGridView.IsChanged)
+            {
+                var r = MessageBox.Show("Your changes have not been saved!\nDo you really want to quit?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (r == MessageBoxResult.No)
+                {
+                    callback(false);
+                    return;
+                }
+            }
+            callback(true);
+        }
+
+        private bool UserWantsToKeepExistingChanges()
+        {
+            if (!this.XmlGridView.IsChanged) return false;
+            var r = MessageBox.Show("Your changes have not been saved!\nDo you really want to continue?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            return (r == MessageBoxResult.No);
+        }
+
     }
 }

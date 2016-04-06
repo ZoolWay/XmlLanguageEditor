@@ -32,6 +32,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public bool IsAnyLoaded { get; protected set; }
 
+        public bool IsChanged { get; protected set; }
+
         public BindableCollection<XmlRecordViewModel> Records { get { return this.records; } }
 
         public XmlGridViewModel()
@@ -44,6 +46,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.IsSecondaryFileLoaded = false;
             this.IsAnyLoaded = false;
             this.lastSecondaryIndex = -1;
+            this.IsChanged = false;
         }
 
         public void CloseAllFiles()
@@ -56,6 +59,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 this.IsMasterFileLoaded = false;
                 this.IsSecondaryFileLoaded = false;
                 this.IsAnyLoaded = false;
+                this.IsChanged = false;
             }
             catch (Exception ex)
             {
@@ -129,6 +133,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
                     var entries = this.Records.Select(r => new Entry() { Id = r.Id, Value = r[i] });
                     await Task.Run(() => this.parser.InjectEntries(secondaryFileNames[i], entries));
                 }
+                this.IsChanged = false;
             }
             catch (Exception ex)
             {
@@ -149,7 +154,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
                     viewModel.Id = record.Id;
                     viewModel.MasterValue = null;
                 }
+                viewModel.IsNotifying = false;
                 viewModel[secondaryColumnIndex] = record.Value;
+                viewModel.IsNotifying = true;
             }
         }
 
@@ -178,9 +185,16 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 var vm = new XmlRecordViewModel();
                 vm.Id = parsedRecord.Id;
                 vm.MasterValue = parsedRecord.Value;
+                vm.PropertyChanged += RecordPropertyChanged;
+                vm.IsNotifying = true;
                 viewModels.Add(vm);
             }
             return viewModels;
+        }
+
+        private void RecordPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            this.IsChanged = true;
         }
 
         private void Clear()
