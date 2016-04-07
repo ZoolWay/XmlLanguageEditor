@@ -13,9 +13,9 @@ Currently supported features:
 * Edit multiple XML language files side-by-side; open, save and close.
 * Optionaly hightlight invalid cells like missing values or values equal to master file.
 * Supports single level XML files where the element name is the constant id.
+* Basic searching
 
 Planned features:
-* Search
-* Adding new ids
+* Adding new IDs/records
 * Support for other XML formats
 * (maybe) support for JSON formats
