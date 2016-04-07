@@ -1,7 +1,9 @@
+
+![Language](Zw.XmlLanguageEditor/Resources/fa-language_64_2_117aa2_none.png?raw=true) 
 # XmlLanguageEditor
 Edit multiple XML files with a element-equals-language-id structure in parallel to each other
 
-![Sample Screenshot](https://raw.githubusercontent.com/ZoolWay/XmlLanguageEditor/master/screenshot-example.png)
+![Sample Screenshot](screenshot-example.png?raw=true)
 
 Supports a simple flat file structure.
 
