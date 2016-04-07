@@ -87,6 +87,7 @@
     <Compile Include="ViewModels\Behaviors\Column.cs" />
     <Compile Include="ViewModels\Behaviors\ColumnConfig.cs" />
     <Compile Include="ViewModels\Behaviors\GridViewSort.cs" />
+    <Compile Include="ViewModels\Behaviors\ListViewBehaviors.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>

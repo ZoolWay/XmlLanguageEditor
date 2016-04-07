@@ -10,14 +10,31 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
         <vc:ConfigToDynamicGridViewConverter x:Key="ConfigToDynamicGridViewConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <Style x:Key="ItemContainerStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                    <Setter Property="Background" Value="LightSkyBlue" />
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <ListView ItemsSource="{Binding Records}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}"
+    <DockPanel LastChildFill="True">
+        <Grid DockPanel.Dock="Top" Margin="4,4,4,0" Visibility="{Binding IsShowingSearchBar, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="SearchText" Grid.Column="0" Margin="0,0,4,0" />
+            <Button Padding="4,2,4,2" Content="{Binding SearchButtonDescription}" x:Name="Search" IsDefault="True" Grid.Column="1" />
+        </Grid>
+        <ListView ItemsSource="{Binding Records}" View="{Binding ColumnConfig, Converter={StaticResource ConfigToDynamicGridViewConverter}}"
               b:GridViewSort.AutoSort="True" b:GridViewSort.ShowSortGlyph="True"
               ItemContainerStyle="{StaticResource ItemContainerStyle}"
+              b:ListViewBehaviors.ScrollIntoViewListItem="{Binding ScrollIntoViewListItem}"
               Margin="4"
               >
-    </ListView>
+        </ListView>
+    </DockPanel>
 </UserControl>

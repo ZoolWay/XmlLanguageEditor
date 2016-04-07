@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,6 +22,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
         private string masterFileName;
         private string masterRootElementName;
         private int lastSecondaryIndex;
+        private int lastSearchMatch;
+        private XmlRecordViewModel lastSearchMatchRecord;
+        private string searchText;
 
         public ColumnConfig ColumnConfig { get; protected set; }
 
@@ -33,6 +35,24 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public bool IsAnyLoaded { get; protected set; }
 
         public bool IsChanged { get; protected set; }
+
+        public bool IsShowingSearchBar { get; set; }
+
+        public string SearchText
+        {
+            get { return this.searchText; }
+            set
+            {
+                if (String.Equals(value, this.searchText)) return;
+                this.searchText = value;
+                ResetSearchPosition(); // when changing the text, reset the position
+                NotifyOfPropertyChange(() => SearchText);
+            }
+        }
+
+        public string SearchButtonDescription { get; set; }
+
+        public XmlRecordViewModel ScrollIntoViewListItem { get; set; }
 
         public BindableCollection<XmlRecordViewModel> Records { get { return this.records; } }
 
@@ -45,8 +65,37 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.IsMasterFileLoaded = false;
             this.IsSecondaryFileLoaded = false;
             this.IsAnyLoaded = false;
+            this.IsShowingSearchBar = true;
             this.lastSecondaryIndex = -1;
             this.IsChanged = false;
+            ResetSearchPosition();
+        }
+
+        public void Search()
+        {
+            if (String.IsNullOrWhiteSpace(this.SearchText)) return;
+            if (this.records.Count <= 0) return;
+            for (int row = this.lastSearchMatch + 1; row < this.records.Count; row++)
+            {
+                if (this.records[row].MatchesSearchText(this.SearchText))
+                {
+                    // reset old search mark
+                    if (this.lastSearchMatchRecord != null) this.lastSearchMatchRecord.IsHighlighted = false;
+
+                    // remeber and highlight row
+                    this.lastSearchMatch = row;
+                    this.lastSearchMatchRecord = this.records[row];
+                    this.lastSearchMatchRecord.IsHighlighted = true;
+
+                    // scroll into view
+                    this.ScrollIntoViewListItem = this.lastSearchMatchRecord;
+
+                    this.SearchButtonDescription = "Find Next";
+                    return;
+                }
+            }
+            ResetSearchPosition();
+            MessageBox.Show("Could not find the search expression", ":(", MessageBoxButton.OK, MessageBoxImage.Exclamation);
         }
 
         public void CloseAllFiles()
@@ -55,6 +104,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             try
             {
                 Clear();
+                ResetSearchPosition();
                 NotifyOfPropertyChange(() => ColumnConfig);
                 this.IsMasterFileLoaded = false;
                 this.IsSecondaryFileLoaded = false;
@@ -75,6 +125,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             try
             {
                 Clear();
+                ResetSearchPosition();
                 this.masterFileName = masterFileName;
                 var result = await Task.Run(() => this.parser.ReadRecords(masterFileName));
                 this.masterRootElementName = result.RootElementName;
@@ -220,6 +271,17 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);                
             }
             return false;
+        }
+
+        private void ResetSearchPosition()
+        {
+            this.lastSearchMatch = -1;
+            if (this.lastSearchMatchRecord != null)
+            {
+                this.lastSearchMatchRecord.IsHighlighted = false;
+                this.lastSearchMatchRecord = null;
+            }
+            this.SearchButtonDescription = "Search";
         }
 
     }
