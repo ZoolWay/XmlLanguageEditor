@@ -155,21 +155,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Save());
         }
 
-        public async void MruClick(RoutedEventArgs e)
+        public void MruClick(RoutedEventArgs e)
         {
             var triggeringMenuItem = e.OriginalSource as MenuItem;
             if (triggeringMenuItem == null) return;
             var mruEntry = triggeringMenuItem.DataContext as Configuration.MruEntry;
             if (mruEntry == null) return;
-            if (this.XmlGridView.IsAnyLoaded)
-            {
-                this.XmlGridView.CloseAllFiles();
-            }
-            await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
-            foreach (var secondary in mruEntry.SecondaryFiles)
-            {
-                await this.XmlGridView.AddSecondaryFile(secondary);
-            }
+            RestoreMruEntry(mruEntry);
         }
 
         public void UpdateConfigValuesFromShell()
@@ -198,6 +190,19 @@ namespace Zw.XmlLanguageEditor.ViewModels
             if (!this.XmlGridView.IsChanged) return false;
             var r = MessageBox.Show("Your changes have not been saved!\nDo you really want to continue?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Question);
             return (r == MessageBoxResult.No);
+        }
+
+        private async void RestoreMruEntry(Configuration.MruEntry mruEntry)
+        {
+            if (this.XmlGridView.IsAnyLoaded)
+            {
+                this.XmlGridView.CloseAllFiles();
+            }
+            await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
+            foreach (var secondary in mruEntry.SecondaryFiles)
+            {
+                await this.XmlGridView.AddSecondaryFile(secondary);
+            }
         }
 
     }
