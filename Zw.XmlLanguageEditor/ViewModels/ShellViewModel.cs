@@ -4,15 +4,19 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System;
 using System.Windows;
+using Zw.XmlLanguageEditor.Ui.Events;
+using DataFormat = Zw.XmlLanguageEditor.Parsing.DataFormat;
 
 namespace Zw.XmlLanguageEditor.ViewModels
 {
-    public class ShellViewModel : Screen, IShell
+    public class ShellViewModel : Screen, IShell, IHandle<LoadedMasterEvent>, IHandle<ClosedMasterEvent>
     {
 
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private readonly Configuration config;
+
+        private readonly IEventAggregator evengAggregator;
 
         private bool isConfigApplied;
 
@@ -21,6 +25,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.DisplayName = "Zw.XmlLanguageEditor";
             this.IsLoading = true;
             this.config = IoC.Get<Configuration>();
+            this.evengAggregator = IoC.Get<IEventAggregator>();
+            this.evengAggregator.Subscribe(this);
             this.isConfigApplied = false;
         }
 
@@ -35,6 +41,36 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public bool OptionAutoAddToSecondaries { get; set; }
 
         public XmlGridViewModel XmlGridView { get; private set; }
+
+        public string MasterFormatDescription { get; set; }
+
+        public bool ShowFormatDescription
+        {
+            get { return !String.IsNullOrWhiteSpace(this.MasterFormatDescription); }
+        }
+
+        public void Handle(LoadedMasterEvent message)
+        {
+            switch (message.Format)
+            {
+                case DataFormat.Xml:
+                    this.MasterFormatDescription = "XML";
+                    break;
+
+                case DataFormat.Json:
+                    this.MasterFormatDescription = "JSON";
+                    break;
+
+                default:
+                    this.MasterFormatDescription = "unknown";
+                    break;
+            }
+        }
+
+        public void Handle(ClosedMasterEvent message)
+        {
+            this.MasterFormatDescription = String.Empty;
+        }
 
         public void CloseApplication()
         {
