@@ -21,7 +21,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
         private readonly IEventAggregator eventAggregator;
         private readonly BindableCollection<XmlRecordViewModel> records;
         private readonly List<string> secondaryFileNames;
-        private readonly Parsing.XmlParser parser;
+        private readonly FormatDetector formatDetector;
+        private readonly ParserFactory parserFactory;
+        private IParser parser;
         private string masterFileName;
         private IFormatOptions masterFormatOptions;
         private int lastSecondaryIndex;
@@ -66,6 +68,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.secondaryFileNames = new List<string>();
             this.parser = new Parsing.XmlParser();
             this.ColumnConfig = new ColumnConfig();
+            this.formatDetector = new FormatDetector();
+            this.parserFactory = new ParserFactory();
             this.IsMasterFileLoaded = false;
             this.IsSecondaryFileLoaded = false;
             this.IsAnyLoaded = false;
@@ -125,15 +129,17 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
-        public async void OpenMasterFile(string masterFileName)
+        public async void OpenMasterFile(string filename)
         {
-            log.InfoFormat("Opening master file: {0}", masterFileName);
+            log.InfoFormat("Opening master file: {0}", filename);
             try
             {
                 Clear();
                 ResetSearchPosition();
-                this.masterFileName = masterFileName;
-                var result = await Task.Run(() => this.parser.ReadRecords(masterFileName));
+                var format = this.formatDetector.Detect(filename);
+                this.parser = this.parserFactory.CreateParser(format);
+                this.masterFileName = filename;
+                var result = await Task.Run(() => this.parser.ReadRecords(filename));
                 this.masterFormatOptions = result.FormatOptions;
                 var viewModels = BuildMasterViewModels(result.Records);
                 this.records.AddRange(viewModels);
@@ -141,13 +147,12 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 this.IsMasterFileLoaded = true;
                 this.IsAnyLoaded = true;
 
-                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(masterFileName, DataFormat.Xml, masterFormatOptions));
+                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(filename, DataFormat.Xml, masterFormatOptions));
             }
             catch (Exception ex)
             {
-                string m = String.Format("Failed to open master file: {0}", masterFileName);
-                log.Error(m, ex);
-                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+                log.Error($"Failed to open master file: {filename}", ex);
+                MessageBox.Show($"Failed to open master file:\n{filename}\n\n{ex.Message}", ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -156,6 +161,12 @@ namespace Zw.XmlLanguageEditor.ViewModels
             log.InfoFormat("Opening secondary file: {0}", secondaryFileName);
             try
             {
+                var format = this.formatDetector.Detect(secondaryFileName);
+                if (format != this.masterFormatOptions.Format)
+                {
+                    throw new Exception($"All language files must match the master data format (currently {this.masterFormatOptions.Format})!");
+                }
+
                 int newIndex = Interlocked.Increment(ref lastSecondaryIndex);
                 while ((this.secondaryFileNames.Count - 1) < newIndex) this.secondaryFileNames.Add(null);
                 this.secondaryFileNames[newIndex] = secondaryFileName;
@@ -167,9 +178,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
             catch (Exception ex)
             {
-                string m = String.Format("Failed to add secondary file: {0}", secondaryFileName);
-                log.Error(m, ex);
-                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+                log.Error($"Failed to add secondary file: {secondaryFileName}", ex);
+                MessageBox.Show($"Failed to add secondary file:\n{secondaryFileName}\n\n{ex.Message}", ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

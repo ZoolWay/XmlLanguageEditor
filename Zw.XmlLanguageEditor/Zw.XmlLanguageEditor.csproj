@@ -87,8 +87,10 @@
     <Compile Include="IShell.cs" />
     <Compile Include="Parsing\DataFormat.cs" />
     <Compile Include="Parsing\Entry.cs" />
+    <Compile Include="Parsing\FormatDetector.cs" />
     <Compile Include="Parsing\IFormatOptions.cs" />
     <Compile Include="Parsing\IParser.cs" />
+    <Compile Include="Parsing\ParserFactory.cs" />
     <Compile Include="Parsing\XmlFormatOptions.cs" />
     <Compile Include="Parsing\XmlParser.cs" />
     <Compile Include="Parsing\ParseResult.cs" />
