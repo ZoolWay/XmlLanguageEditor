@@ -194,14 +194,22 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private async void RestoreMruEntry(Configuration.MruEntry mruEntry)
         {
-            if (this.XmlGridView.IsAnyLoaded)
+            this.IsLoading = true;
+            try
             {
-                this.XmlGridView.CloseAllFiles();
+                if (this.XmlGridView.IsAnyLoaded)
+                {
+                    this.XmlGridView.CloseAllFiles();
+                }
+                await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
+                foreach (var secondary in mruEntry.SecondaryFiles)
+                {
+                    await this.XmlGridView.AddSecondaryFile(secondary);
+                }
             }
-            await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
-            foreach (var secondary in mruEntry.SecondaryFiles)
+            finally
             {
-                await this.XmlGridView.AddSecondaryFile(secondary);
+                this.IsLoading = false;
             }
         }
 
