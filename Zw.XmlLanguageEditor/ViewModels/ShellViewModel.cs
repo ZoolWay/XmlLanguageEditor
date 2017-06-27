@@ -57,6 +57,10 @@ namespace Zw.XmlLanguageEditor.ViewModels
                     this.MasterFormatDescription = "XML";
                     break;
 
+                case DataFormat.Json:
+                    this.MasterFormatDescription = "JSON";
+                    break;
+
                 default:
                     this.MasterFormatDescription = "unknown";
                     break;
