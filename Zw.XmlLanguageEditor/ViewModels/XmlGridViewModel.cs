@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Zw.XmlLanguageEditor.Parsing;
+using Zw.XmlLanguageEditor.Ui.Events;
 using Zw.XmlLanguageEditor.ViewModels.Behaviors;
+using DataFormat = Zw.XmlLanguageEditor.Parsing.DataFormat;
 
 namespace Zw.XmlLanguageEditor.ViewModels
 {
@@ -16,11 +18,14 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly IEventAggregator eventAggregator;
         private readonly BindableCollection<XmlRecordViewModel> records;
         private readonly List<string> secondaryFileNames;
-        private readonly Parsing.Parser parser;
+        private readonly FormatDetector formatDetector;
+        private readonly ParserFactory parserFactory;
+        private IParser parser;
         private string masterFileName;
-        private string masterRootElementName;
+        private IFormatOptions masterFormatOptions;
         private int lastSecondaryIndex;
         private int lastSearchMatch;
         private XmlRecordViewModel lastSearchMatchRecord;
@@ -58,10 +63,13 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public XmlGridViewModel()
         {
+            this.eventAggregator = IoC.Get<IEventAggregator>();
             this.records = new BindableCollection<XmlRecordViewModel>();
             this.secondaryFileNames = new List<string>();
-            this.parser = new Parsing.Parser();
+            this.parser = new Parsing.XmlParser();
             this.ColumnConfig = new ColumnConfig();
+            this.formatDetector = new FormatDetector();
+            this.parserFactory = new ParserFactory();
             this.IsMasterFileLoaded = false;
             this.IsSecondaryFileLoaded = false;
             this.IsAnyLoaded = false;
@@ -110,6 +118,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 this.IsSecondaryFileLoaded = false;
                 this.IsAnyLoaded = false;
                 this.IsChanged = false;
+
+                this.eventAggregator.PublishOnUIThread(new ClosedMasterEvent());
             }
             catch (Exception ex)
             {
@@ -119,27 +129,30 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
-        public async void OpenMasterFile(string masterFileName)
+        public async void OpenMasterFile(string filename)
         {
-            log.InfoFormat("Opening master file: {0}", masterFileName);
+            log.InfoFormat("Opening master file: {0}", filename);
             try
             {
                 Clear();
                 ResetSearchPosition();
-                this.masterFileName = masterFileName;
-                var result = await Task.Run(() => this.parser.ReadRecords(masterFileName));
-                this.masterRootElementName = result.RootElementName;
+                var format = this.formatDetector.Detect(filename);
+                this.parser = this.parserFactory.CreateParser(format);
+                this.masterFileName = filename;
+                var result = await Task.Run(() => this.parser.ReadRecords(filename));
+                this.masterFormatOptions = result.FormatOptions;
                 var viewModels = BuildMasterViewModels(result.Records);
                 this.records.AddRange(viewModels);
                 BuildMasterColumns();
                 this.IsMasterFileLoaded = true;
                 this.IsAnyLoaded = true;
+
+                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(filename, result.FormatOptions.Format, masterFormatOptions));
             }
             catch (Exception ex)
             {
-                string m = String.Format("Failed to open master file: {0}", masterFileName);
-                log.Error(m, ex);
-                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+                log.Error($"Failed to open master file: {filename}", ex);
+                MessageBox.Show($"Failed to open master file:\n{filename}\n\n{ex.Message}", ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -148,6 +161,16 @@ namespace Zw.XmlLanguageEditor.ViewModels
             log.InfoFormat("Opening secondary file: {0}", secondaryFileName);
             try
             {
+                if (this.parser == null)
+                {
+                    throw new Exception("Must successfully open a master file first!");
+                }
+                var format = this.formatDetector.Detect(secondaryFileName);
+                if (!this.parser.IsSupporting(format))
+                {
+                    throw new Exception($"The current parser '{this.parser.Name}' does not support the detected format '{format}'!");
+                }
+
                 int newIndex = Interlocked.Increment(ref lastSecondaryIndex);
                 while ((this.secondaryFileNames.Count - 1) < newIndex) this.secondaryFileNames.Add(null);
                 this.secondaryFileNames[newIndex] = secondaryFileName;
@@ -159,9 +182,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
             catch (Exception ex)
             {
-                string m = String.Format("Failed to add secondary file: {0}", secondaryFileName);
-                log.Error(m, ex);
-                MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
+                log.Error($"Failed to add secondary file: {secondaryFileName}", ex);
+                MessageBox.Show($"Failed to add secondary file:\n{secondaryFileName}\n\n{ex.Message}", ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -261,7 +283,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         {
             try
             {
-                await Task.Run(() => parser.CreateEmpty(this.masterRootElementName, secondaryFileName));
+                await Task.Run(() => parser.CreateEmpty(this.masterFormatOptions, secondaryFileName));
                 return true;
             }
             catch (Exception ex)
