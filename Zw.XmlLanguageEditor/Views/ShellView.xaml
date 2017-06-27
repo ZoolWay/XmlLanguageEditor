@@ -29,6 +29,14 @@
                     <Separator />
                     <MenuItem Header="Save all" cal:Message.Attach="SaveAll" IsEnabled="{Binding XmlGridView.IsAnyLoaded}" />
                     <Separator />
+                    <MenuItem Header="Recent" IsEnabled="{Binding HasMru}" ItemsSource="{Binding Mru}" cal:Message.Attach="[Click] = [MruClick($eventArgs)]">
+                        <MenuItem.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding MasterFile}"></TextBlock>
+                            </DataTemplate>
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                    <Separator />
                     <MenuItem Header="Exit" cal:Message.Attach="CloseApplication" />
                 </MenuItem>
                 <MenuItem Header="Options">

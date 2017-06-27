@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Caliburn.Micro;
 using Newtonsoft.Json;
 
 namespace Zw.XmlLanguageEditor
@@ -15,12 +16,12 @@ namespace Zw.XmlLanguageEditor
 
         public bool HightlightEmptyCells { get; set; }
         public bool HighlightMasterMatchingCells { get; set; }
-        public List<MruEntry> MostRecentlyUsedList { get; set; }
+        public BindableCollection<MruEntry> MostRecentlyUsedList { get; set; }
         public bool AutoLoadMostRecent { get; set; }
 
         public Configuration()
         {
-            this.MostRecentlyUsedList = new List<MruEntry>();
+            this.MostRecentlyUsedList = new BindableCollection<MruEntry>();
             SetDefaults();
         }
 
@@ -30,7 +31,8 @@ namespace Zw.XmlLanguageEditor
             Properties.Settings.Default.Reload();
             this.HightlightEmptyCells = Properties.Settings.Default.HighlightEmptyCells;
             this.HighlightMasterMatchingCells = Properties.Settings.Default.HightlightMasterMatchingCells;
-            this.MostRecentlyUsedList = JsonConvert.DeserializeObject<List<MruEntry>>(Properties.Settings.Default.Mru);
+            var mruItems = JsonConvert.DeserializeObject<IEnumerable<MruEntry>>(Properties.Settings.Default.Mru);
+            this.MostRecentlyUsedList.AddRange(mruItems);
             this.AutoLoadMostRecent = Properties.Settings.Default.AutoLoadMostRecent;
         }
 

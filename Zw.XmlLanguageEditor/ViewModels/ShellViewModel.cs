@@ -3,7 +3,9 @@ using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using Zw.XmlLanguageEditor.Ui.Events;
 using DataFormat = Zw.XmlLanguageEditor.Parsing.DataFormat;
 
@@ -43,6 +45,10 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public XmlGridViewModel XmlGridView { get; private set; }
 
         public string MasterFormatDescription { get; set; }
+
+        public IObservableCollection<Configuration.MruEntry> Mru => this.config.MostRecentlyUsedList;
+
+        public bool HasMru => (this.Mru != null) && (this.Mru.Count > 0);
 
         public bool ShowFormatDescription
         {
@@ -134,6 +140,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Load());
             this.OptionHighlightEmptyCells = config.HightlightEmptyCells;
             this.OptionHighlightMasterMatchingCells = config.HighlightMasterMatchingCells;
+            NotifyOfPropertyChange(nameof(Mru));
+            NotifyOfPropertyChange(nameof(HasMru));
+            config.MostRecentlyUsedList.CollectionChanged += (sender, args) => NotifyOfPropertyChange(nameof(HasMru));
             this.isConfigApplied = true;
             this.XmlGridView = new XmlGridViewModel();
             await Task.Delay(250);
@@ -144,6 +153,23 @@ namespace Zw.XmlLanguageEditor.ViewModels
         {
             if (!close) return;
             await Task.Run(() => config.Save());
+        }
+
+        public async void MruClick(RoutedEventArgs e)
+        {
+            var triggeringMenuItem = e.OriginalSource as MenuItem;
+            if (triggeringMenuItem == null) return;
+            var mruEntry = triggeringMenuItem.DataContext as Configuration.MruEntry;
+            if (mruEntry == null) return;
+            if (this.XmlGridView.IsAnyLoaded)
+            {
+                this.XmlGridView.CloseAllFiles();
+            }
+            await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
+            foreach (var secondary in mruEntry.SecondaryFiles)
+            {
+                await this.XmlGridView.AddSecondaryFile(secondary);
+            }
         }
 
         public void UpdateConfigValuesFromShell()
