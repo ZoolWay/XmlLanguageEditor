@@ -11,6 +11,8 @@ namespace Zw.XmlLanguageEditor.Parsing
     {
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        public string Name => "XmlParser";
+
         public void CreateEmpty(IFormatOptions options, string fileName)
         {
             var xmlOptions = options as XmlFormatOptions;
@@ -63,6 +65,11 @@ namespace Zw.XmlLanguageEditor.Parsing
             }
             doc.Save(fileName);
             log.InfoFormat("Saved file with {0} changes applied ({1} nodes created)", countModified, countCreated);
+        }
+
+        public bool IsSupporting(DataFormat format)
+        {
+            return (format == DataFormat.Xml);
         }
 
         private string GetXPath(Entry entry)

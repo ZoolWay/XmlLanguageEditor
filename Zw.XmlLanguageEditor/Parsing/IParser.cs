@@ -8,6 +8,8 @@ namespace Zw.XmlLanguageEditor.Parsing
     /// </summary>
     internal interface IParser
     {
+        string Name { get; }
+
         /// <summary>
         /// Reads langauge records from the given file.
         /// </summary>
@@ -28,5 +30,12 @@ namespace Zw.XmlLanguageEditor.Parsing
         /// <param name="formatOptions"></param>
         /// <param name="fileName"></param>
         void CreateEmpty(IFormatOptions formatOptions, string fileName);
+
+        /// <summary>
+        /// Returns true if the parser can work with the given format.
+        /// </summary>
+        /// <param name="format"></param>
+        /// <returns></returns>
+        bool IsSupporting(DataFormat format);
     }
 }

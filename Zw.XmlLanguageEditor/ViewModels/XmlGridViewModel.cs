@@ -161,10 +161,14 @@ namespace Zw.XmlLanguageEditor.ViewModels
             log.InfoFormat("Opening secondary file: {0}", secondaryFileName);
             try
             {
-                var format = this.formatDetector.Detect(secondaryFileName);
-                if (format != this.masterFormatOptions.Format)
+                if (this.parser == null)
                 {
-                    throw new Exception($"All language files must match the master data format (currently {this.masterFormatOptions.Format})!");
+                    throw new Exception("Must successfully open a master file first!");
+                }
+                var format = this.formatDetector.Detect(secondaryFileName);
+                if (!this.parser.IsSupporting(format))
+                {
+                    throw new Exception($"The current parser '{this.parser.Name}' does not support the detected format '{format}'!");
                 }
 
                 int newIndex = Interlocked.Increment(ref lastSecondaryIndex);
