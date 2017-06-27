@@ -3,7 +3,10 @@ using Microsoft.Win32;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using Zw.XmlLanguageEditor.Ui.Events;
 using DataFormat = Zw.XmlLanguageEditor.Parsing.DataFormat;
 
@@ -40,9 +43,15 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public bool OptionAutoAddToSecondaries { get; set; }
 
+        public bool OptionAutoLoadMostRecent { get; set; }
+
         public XmlGridViewModel XmlGridView { get; private set; }
 
         public string MasterFormatDescription { get; set; }
+
+        public IObservableCollection<Configuration.MruEntry> Mru => this.config.MostRecentlyUsedList;
+
+        public bool HasMru => (this.Mru != null) && (this.Mru.Count > 0);
 
         public bool ShowFormatDescription
         {
@@ -134,10 +143,20 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Load());
             this.OptionHighlightEmptyCells = config.HightlightEmptyCells;
             this.OptionHighlightMasterMatchingCells = config.HighlightMasterMatchingCells;
+            this.OptionAutoLoadMostRecent = config.AutoLoadMostRecent;
+            NotifyOfPropertyChange(nameof(Mru));
+            NotifyOfPropertyChange(nameof(HasMru));
+            config.MostRecentlyUsedList.CollectionChanged += (sender, args) => NotifyOfPropertyChange(nameof(HasMru));
             this.isConfigApplied = true;
             this.XmlGridView = new XmlGridViewModel();
             await Task.Delay(250);
             this.IsLoading = false;
+
+            if ((this.OptionAutoLoadMostRecent) && (config.MostRecentlyUsedList.Count > 0))
+            {
+                var lastMruEntry = config.MostRecentlyUsedList.OrderByDescending(e => e.LastUsed).First();
+                RestoreMruEntry(lastMruEntry);
+            }
         }
 
         protected async override void OnDeactivate(bool close)
@@ -146,11 +165,21 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Save());
         }
 
+        public void MruClick(RoutedEventArgs e)
+        {
+            var triggeringMenuItem = e.OriginalSource as MenuItem;
+            if (triggeringMenuItem == null) return;
+            var mruEntry = triggeringMenuItem.DataContext as Configuration.MruEntry;
+            if (mruEntry == null) return;
+            RestoreMruEntry(mruEntry);
+        }
+
         public void UpdateConfigValuesFromShell()
         {
             if (!this.isConfigApplied) return;
             this.config.HightlightEmptyCells = this.OptionHighlightEmptyCells;
             this.config.HighlightMasterMatchingCells = this.OptionHighlightMasterMatchingCells;
+            this.config.AutoLoadMostRecent = this.OptionAutoLoadMostRecent;
         }
 
         public override void CanClose(Action<bool> callback)
@@ -172,6 +201,27 @@ namespace Zw.XmlLanguageEditor.ViewModels
             if (!this.XmlGridView.IsChanged) return false;
             var r = MessageBox.Show("Your changes have not been saved!\nDo you really want to continue?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Question);
             return (r == MessageBoxResult.No);
+        }
+
+        private async void RestoreMruEntry(Configuration.MruEntry mruEntry)
+        {
+            this.IsLoading = true;
+            try
+            {
+                if (this.XmlGridView.IsAnyLoaded)
+                {
+                    this.XmlGridView.CloseAllFiles();
+                }
+                await this.XmlGridView.OpenMasterFile(mruEntry.MasterFile);
+                foreach (var secondary in mruEntry.SecondaryFiles)
+                {
+                    await this.XmlGridView.AddSecondaryFile(secondary);
+                }
+            }
+            finally
+            {
+                this.IsLoading = false;
+            }
         }
 
     }

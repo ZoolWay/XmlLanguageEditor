@@ -23,6 +23,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         private readonly List<string> secondaryFileNames;
         private readonly FormatDetector formatDetector;
         private readonly ParserFactory parserFactory;
+        private readonly Configuration config;
         private IParser parser;
         private string masterFileName;
         private IFormatOptions masterFormatOptions;
@@ -64,6 +65,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public XmlGridViewModel()
         {
             this.eventAggregator = IoC.Get<IEventAggregator>();
+            this.config = IoC.Get<Configuration>();
             this.records = new BindableCollection<XmlRecordViewModel>();
             this.secondaryFileNames = new List<string>();
             this.parser = new Parsing.XmlParser();
@@ -111,6 +113,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             log.InfoFormat("Closing master and {0} secondary file(s)", secondaryFileNames.Count);
             try
             {
+                WriteMruEntry();
                 Clear();
                 ResetSearchPosition();
                 NotifyOfPropertyChange(() => ColumnConfig);
@@ -129,7 +132,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
-        public async void OpenMasterFile(string filename)
+        public async Task OpenMasterFile(string filename)
         {
             log.InfoFormat("Opening master file: {0}", filename);
             try
@@ -156,7 +159,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             }
         }
 
-        public async void AddSecondaryFile(string secondaryFileName)
+        public async Task AddSecondaryFile(string secondaryFileName)
         {
             log.InfoFormat("Opening secondary file: {0}", secondaryFileName);
             try
@@ -207,6 +210,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
                     await Task.Run(() => this.parser.InjectEntries(secondaryFileNames[i], entries));
                 }
                 this.IsChanged = false;
+                WriteMruEntry();
             }
             catch (Exception ex)
             {
@@ -214,6 +218,26 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 log.Error(m, ex);
                 MessageBox.Show(m, ":(", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void WriteMruEntry()
+        {
+            var entry = new Configuration.MruEntry();
+            entry.MasterFile = this.masterFileName;
+            entry.SecondaryFiles = this.secondaryFileNames.ToArray();
+            entry.LastUsed = DateTime.UtcNow;
+
+            // remove other compositions for that master
+            var entriesToRemove = this.config.MostRecentlyUsedList.Where((e) => e.MasterFile == entry.MasterFile).ToArray();
+            if (entriesToRemove.Length > 0)
+                this.config.MostRecentlyUsedList.RemoveRange(entriesToRemove);
+
+            // only keep 4 newest (makes it the last 5)
+            var entriesTooOld = this.config.MostRecentlyUsedList.OrderByDescending(e => e.LastUsed).Skip(4).ToArray();
+            if (entriesTooOld.Length > 0)
+                this.config.MostRecentlyUsedList.RemoveRange(entriesTooOld);
+
+            this.config.MostRecentlyUsedList.Add(entry);
         }
 
         private void MergeSecondaryRecords(IEnumerable<Entry> parsedRecords, int secondaryColumnIndex)
