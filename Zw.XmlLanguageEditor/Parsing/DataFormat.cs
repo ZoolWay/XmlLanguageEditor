@@ -4,7 +4,8 @@ namespace Zw.XmlLanguageEditor.Parsing
 {
     public enum DataFormat
     {
+        Unknown = 0,
         Xml,
-        Unknown,
+        Json,
     }
 }

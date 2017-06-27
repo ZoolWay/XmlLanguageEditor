@@ -52,9 +52,8 @@
       <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PropertyChanged, Version=1.51.0.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.1.51.0\lib\dotnet\PropertyChanged.dll</HintPath>
@@ -90,6 +89,8 @@
     <Compile Include="Parsing\FormatDetector.cs" />
     <Compile Include="Parsing\IFormatOptions.cs" />
     <Compile Include="Parsing\IParser.cs" />
+    <Compile Include="Parsing\JsonFormatOptions.cs" />
+    <Compile Include="Parsing\JsonParser.cs" />
     <Compile Include="Parsing\ParserFactory.cs" />
     <Compile Include="Parsing\XmlFormatOptions.cs" />
     <Compile Include="Parsing\XmlParser.cs" />

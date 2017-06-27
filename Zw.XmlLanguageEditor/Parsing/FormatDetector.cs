@@ -19,6 +19,7 @@ namespace Zw.XmlLanguageEditor.Parsing
                     for (int i = 0; i < readBytes; i++)
                     {
                         if (buffer[i] == '<') return DataFormat.Xml;
+                        if (buffer[i] == '{') return DataFormat.Json;
                     }
                     if (readBytes < BUFFER_SIZE) return DataFormat.Unknown; // no more data
                 } while (readBytes > 0);
