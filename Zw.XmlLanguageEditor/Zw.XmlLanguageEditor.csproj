@@ -85,12 +85,15 @@
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="IShell.cs" />
+    <Compile Include="Parsing\DataFormat.cs" />
     <Compile Include="Parsing\Entry.cs" />
     <Compile Include="Parsing\IFormatOptions.cs" />
     <Compile Include="Parsing\IParser.cs" />
     <Compile Include="Parsing\XmlFormatOptions.cs" />
     <Compile Include="Parsing\XmlParser.cs" />
     <Compile Include="Parsing\ParseResult.cs" />
+    <Compile Include="Ui\Events\ClosedMasterEvent.cs" />
+    <Compile Include="Ui\Events\LoadedMasterEvent.cs" />
     <Compile Include="ViewModels\Behaviors\Column.cs" />
     <Compile Include="ViewModels\Behaviors\ColumnConfig.cs" />
     <Compile Include="ViewModels\Behaviors\GridViewSort.cs" />

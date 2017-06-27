@@ -10,7 +10,7 @@ namespace Zw.XmlLanguageEditor.Parsing
     /// Defines common format options.
     /// Remember to have all implementations as immutables.
     /// </summary>
-    internal interface IFormatOptions
+    public interface IFormatOptions
     {
     }
 }

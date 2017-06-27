@@ -7,7 +7,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Zw.XmlLanguageEditor.Parsing;
+using Zw.XmlLanguageEditor.Ui.Events;
 using Zw.XmlLanguageEditor.ViewModels.Behaviors;
+using DataFormat = Zw.XmlLanguageEditor.Parsing.DataFormat;
 
 namespace Zw.XmlLanguageEditor.ViewModels
 {
@@ -16,6 +18,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+        private readonly IEventAggregator eventAggregator;
         private readonly BindableCollection<XmlRecordViewModel> records;
         private readonly List<string> secondaryFileNames;
         private readonly Parsing.XmlParser parser;
@@ -58,6 +61,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         public XmlGridViewModel()
         {
+            this.eventAggregator = IoC.Get<IEventAggregator>();
             this.records = new BindableCollection<XmlRecordViewModel>();
             this.secondaryFileNames = new List<string>();
             this.parser = new Parsing.XmlParser();
@@ -110,6 +114,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 this.IsSecondaryFileLoaded = false;
                 this.IsAnyLoaded = false;
                 this.IsChanged = false;
+
+                this.eventAggregator.PublishOnUIThread(new ClosedMasterEvent());
             }
             catch (Exception ex)
             {
@@ -134,6 +140,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 BuildMasterColumns();
                 this.IsMasterFileLoaded = true;
                 this.IsAnyLoaded = true;
+
+                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(masterFileName, DataFormat.Xml, masterFormatOptions));
             }
             catch (Exception ex)
             {
