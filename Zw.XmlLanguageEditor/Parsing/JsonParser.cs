@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Zw.XmlLanguageEditor.Parsing
 {
@@ -14,14 +14,15 @@ namespace Zw.XmlLanguageEditor.Parsing
         {
             var result = new ParseResult();
             var records = new List<Entry>();
-            var warnings = new List<string>();
+            JObject rootObject;
             using (TextReader stream = new StreamReader(filename, true))
             {
                 using (JsonReader reader = new JsonTextReader(stream))
                 {
-                    ReadLevel(reader, records, new string[0], warnings);
+                    rootObject = JObject.Load(reader);
                 }
             }
+            ReadLevel(rootObject, records);
             result.Records = records;
             result.FormatOptions = new JsonFormatOptions();
             return result;
@@ -42,42 +43,24 @@ namespace Zw.XmlLanguageEditor.Parsing
             return (format == DataFormat.Json);
         }
 
-        private void ReadLevel(JsonReader reader, List<Entry> records, string[] parents, List<string> warnings)
+        private void ReadLevel(JObject obj, List<Entry> records)
         {
-            string currentPropertyName = null;
-            string levelPrefix = String.Join(".", parents);
-            if (parents.Length > 0) levelPrefix += ".";
-            while (reader.Read())
+            foreach (JProperty property in obj.Properties())
             {
-                if (reader.TokenType == JsonToken.PropertyName)
+                if (property.Type == JTokenType.Property)
                 {
-                    currentPropertyName = reader.Value as string;
-                    continue; // skip resetting currentPropertyName below
+                    if (property.Value is JObject)
+                    {
+                        ReadLevel((JObject)property.Value, records);
+                    }
+                    else if (property.Value is JValue)
+                    {
+                        Entry record = new Entry();
+                        record.Id = property.Path;
+                        record.Value = ((JValue)property.Value).Value<string>();
+                        records.Add(record);
+                    }
                 }
-                else if (reader.TokenType == JsonToken.String)
-                {
-                    var record = new Entry();
-                    record.Id = $"{levelPrefix}{currentPropertyName}";
-                    record.Value = reader.Value as string; // property value (must be string)
-                    records.Add(record);
-                }
-                else if ((reader.TokenType == JsonToken.StartObject) && (currentPropertyName != null))
-                {
-                    var newParents = parents.ToList();
-                    newParents.Add(currentPropertyName);
-                    ReadLevel(reader, records, newParents.ToArray(), warnings);
-                }
-                else if (reader.TokenType == JsonToken.StartArray)
-                {
-                    warnings.Add("JSON Arrays are not supported in language structures!");
-                    reader.Skip();
-                }
-                else if (reader.TokenType == JsonToken.EndObject)
-                {
-                    return; // go hierachy up, level completed
-                }
-                // ignore others
-                currentPropertyName = null;
             }
         }
 
