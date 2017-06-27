@@ -23,12 +23,11 @@ namespace Zw.XmlLanguageEditor.Parsing
         public ParseResult ReadRecords(string filename)
         {
             var result = new ParseResult();
-            var xmlOptions = new XmlFormatOptions();
             var records = new List<Entry>();
             XmlDocument doc = new XmlDocument();
             doc.Load(filename);
             log.InfoFormat("Loaded '{0}' with {1} child nodes for reading", filename, doc.DocumentElement?.ChildNodes?.Count ?? -1);
-            xmlOptions.RootElementName = doc.DocumentElement?.Name;
+            var xmlOptions = new XmlFormatOptions(doc.DocumentElement?.Name);
             result.FormatOptions = xmlOptions;
             foreach (XmlNode node in doc.DocumentElement.ChildNodes)
             {

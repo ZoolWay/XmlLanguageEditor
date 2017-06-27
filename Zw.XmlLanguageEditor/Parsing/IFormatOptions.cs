@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Zw.XmlLanguageEditor.Parsing
 {
-    interface IFormatOptions
+    /// <summary>
+    /// Defines common format options.
+    /// Remember to have all implementations as immutables.
+    /// </summary>
+    internal interface IFormatOptions
     {
     }
 }

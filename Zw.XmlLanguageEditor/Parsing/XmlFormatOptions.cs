@@ -4,6 +4,11 @@ namespace Zw.XmlLanguageEditor.Parsing
 {
     internal class XmlFormatOptions : IFormatOptions
     {
-        public string RootElementName { get; set; }
+        public string RootElementName { get; private set; }
+
+        public XmlFormatOptions(string rootElementName)
+        {
+            this.RootElementName = rootElementName;
+        }
     }
 }
