@@ -45,6 +45,8 @@
                     <Separator />
                     <MenuItem Header="Auto-add missing entries to master file" IsCheckable="True" IsChecked="{Binding OptionAutoAddToMaster}" />
                     <MenuItem Header="Auto-add missing entries to secondary files" IsCheckable="True" IsChecked="{Binding OptionAutoAddToSecondaries}" />
+                    <Separator />
+                    <MenuItem Header="Load last used fileset on startup" IsCheckable="True" IsChecked="{Binding OptionAutoLoadMostRecent}" cal:Message.Attach="[Checked] = [UpdateConfigValuesFromShell]; [Unchecked] = [UpdateConfigValuesFromShell]" />
                 </MenuItem>
             </Menu>
             

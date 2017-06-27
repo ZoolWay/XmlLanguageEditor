@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Zw.XmlLanguageEditor.Ui.Events;
@@ -41,6 +42,8 @@ namespace Zw.XmlLanguageEditor.ViewModels
         public bool OptionAutoAddToMaster { get; set; }
 
         public bool OptionAutoAddToSecondaries { get; set; }
+
+        public bool OptionAutoLoadMostRecent { get; set; }
 
         public XmlGridViewModel XmlGridView { get; private set; }
 
@@ -140,6 +143,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             await Task.Run(() => config.Load());
             this.OptionHighlightEmptyCells = config.HightlightEmptyCells;
             this.OptionHighlightMasterMatchingCells = config.HighlightMasterMatchingCells;
+            this.OptionAutoLoadMostRecent = config.AutoLoadMostRecent;
             NotifyOfPropertyChange(nameof(Mru));
             NotifyOfPropertyChange(nameof(HasMru));
             config.MostRecentlyUsedList.CollectionChanged += (sender, args) => NotifyOfPropertyChange(nameof(HasMru));
@@ -147,6 +151,12 @@ namespace Zw.XmlLanguageEditor.ViewModels
             this.XmlGridView = new XmlGridViewModel();
             await Task.Delay(250);
             this.IsLoading = false;
+
+            if ((this.OptionAutoLoadMostRecent) && (config.MostRecentlyUsedList.Count > 0))
+            {
+                var lastMruEntry = config.MostRecentlyUsedList.OrderByDescending(e => e.LastUsed).First();
+                RestoreMruEntry(lastMruEntry);
+            }
         }
 
         protected async override void OnDeactivate(bool close)
@@ -169,6 +179,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
             if (!this.isConfigApplied) return;
             this.config.HightlightEmptyCells = this.OptionHighlightEmptyCells;
             this.config.HighlightMasterMatchingCells = this.OptionHighlightMasterMatchingCells;
+            this.config.AutoLoadMostRecent = this.OptionAutoLoadMostRecent;
         }
 
         public override void CanClose(Action<bool> callback)

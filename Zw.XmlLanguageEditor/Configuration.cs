@@ -41,7 +41,7 @@ namespace Zw.XmlLanguageEditor
             Properties.Settings.Default.HighlightEmptyCells = this.HightlightEmptyCells;
             Properties.Settings.Default.HightlightMasterMatchingCells = this.HighlightMasterMatchingCells;
             Properties.Settings.Default.Mru = JsonConvert.SerializeObject(this.MostRecentlyUsedList);
-            Properties.Settings.Default.AutoLoadMostRecent = Properties.Settings.Default.AutoLoadMostRecent;
+            Properties.Settings.Default.AutoLoadMostRecent = this.AutoLoadMostRecent;
             Properties.Settings.Default.Save();
         }
 
