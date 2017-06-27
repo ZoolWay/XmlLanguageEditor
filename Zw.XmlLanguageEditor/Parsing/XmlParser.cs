@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace Zw.XmlLanguageEditor.Parsing
@@ -10,25 +7,29 @@ namespace Zw.XmlLanguageEditor.Parsing
     /// <summary>
     /// Parser for simple XML language files where the XML element name is the text id. No nesting supported.
     /// </summary>
-    class Parser
+    internal class XmlParser : IParser
     {
         private static readonly log4net.ILog log = global::log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        internal void CreateEmpty(string rootElementName, string fileName)
+        public void CreateEmpty(IFormatOptions options, string fileName)
         {
+            var xmlOptions = options as XmlFormatOptions;
+            if (xmlOptions == null) throw new ArgumentException("XmlParser requires XmlFormatOptions!", nameof(options));
             XmlDocument doc = new XmlDocument();
-            doc.AppendChild(doc.CreateElement(rootElementName));
+            doc.AppendChild(doc.CreateElement(xmlOptions.RootElementName));
             doc.Save(fileName);
         }
 
-        internal ParseResult ReadRecords(string filename)
+        public ParseResult ReadRecords(string filename)
         {
             var result = new ParseResult();
+            var xmlOptions = new XmlFormatOptions();
             var records = new List<Entry>();
             XmlDocument doc = new XmlDocument();
             doc.Load(filename);
             log.InfoFormat("Loaded '{0}' with {1} child nodes for reading", filename, doc.DocumentElement?.ChildNodes?.Count ?? -1);
-            result.RootElementName = doc.DocumentElement?.Name;
+            xmlOptions.RootElementName = doc.DocumentElement?.Name;
+            result.FormatOptions = xmlOptions;
             foreach (XmlNode node in doc.DocumentElement.ChildNodes)
             {
                 if (node.NodeType != XmlNodeType.Element) continue;
@@ -39,7 +40,7 @@ namespace Zw.XmlLanguageEditor.Parsing
             return result;
         }
 
-        internal void InjectEntries(string fileName, IEnumerable<Entry> entries)
+        public void InjectEntries(string fileName, IEnumerable<Entry> entries)
         {
             int countModified = 0;
             int countCreated = 0;

@@ -18,9 +18,9 @@ namespace Zw.XmlLanguageEditor.ViewModels
 
         private readonly BindableCollection<XmlRecordViewModel> records;
         private readonly List<string> secondaryFileNames;
-        private readonly Parsing.Parser parser;
+        private readonly Parsing.XmlParser parser;
         private string masterFileName;
-        private string masterRootElementName;
+        private IFormatOptions masterFormatOptions;
         private int lastSecondaryIndex;
         private int lastSearchMatch;
         private XmlRecordViewModel lastSearchMatchRecord;
@@ -60,7 +60,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         {
             this.records = new BindableCollection<XmlRecordViewModel>();
             this.secondaryFileNames = new List<string>();
-            this.parser = new Parsing.Parser();
+            this.parser = new Parsing.XmlParser();
             this.ColumnConfig = new ColumnConfig();
             this.IsMasterFileLoaded = false;
             this.IsSecondaryFileLoaded = false;
@@ -128,7 +128,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 ResetSearchPosition();
                 this.masterFileName = masterFileName;
                 var result = await Task.Run(() => this.parser.ReadRecords(masterFileName));
-                this.masterRootElementName = result.RootElementName;
+                this.masterFormatOptions = result.FormatOptions;
                 var viewModels = BuildMasterViewModels(result.Records);
                 this.records.AddRange(viewModels);
                 BuildMasterColumns();
@@ -261,7 +261,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
         {
             try
             {
-                await Task.Run(() => parser.CreateEmpty(this.masterRootElementName, secondaryFileName));
+                await Task.Run(() => parser.CreateEmpty(this.masterFormatOptions, secondaryFileName));
                 return true;
             }
             catch (Exception ex)
