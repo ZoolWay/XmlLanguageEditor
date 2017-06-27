@@ -147,7 +147,7 @@ namespace Zw.XmlLanguageEditor.ViewModels
                 this.IsMasterFileLoaded = true;
                 this.IsAnyLoaded = true;
 
-                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(filename, DataFormat.Xml, masterFormatOptions));
+                this.eventAggregator.PublishOnUIThread(new LoadedMasterEvent(filename, result.FormatOptions.Format, masterFormatOptions));
             }
             catch (Exception ex)
             {
